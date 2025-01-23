@@ -118,6 +118,7 @@ regd_users.delete("/auth/review/:isbn/:reviewId", (req, res) => {
       }
     }
   });
+  });
 
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
