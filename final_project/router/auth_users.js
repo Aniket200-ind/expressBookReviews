@@ -91,6 +91,33 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
   }
 });
 
+regd_users.delete("/auth/review/:isbn/:reviewId", (req, res) => {
+  const token = req.headers['authorization'];
+  const isbnCode = req.params.isbn;
+  const reviewId = req.params.reviewId;
+
+  if (!token) {
+    return res.status(401).json({ message: "Access token is missing or invalid" });
+  }
+
+  jwt.verify(token, "fingerprint_customer", function (err, decoded) {
+    if (err) {
+      console.error("Token verification error:", err);
+      return res.status(401).json({ message: "Invalid token" });
+    } else {
+      if (books[isbnCode]) {
+        const reviewIndex = books[isbnCode].reviews.findIndex(review => review.id === reviewId);
+        if (reviewIndex !== -1) {
+          books[isbnCode].reviews.splice(reviewIndex, 1);
+          return res.status(200).json({ message: "Review deleted successfully" });
+        } else {
+          return res.status(404).json({ message: "Review not found" });
+        }
+      } else {
+        return res.status(404).json({ message: "Book not found" });
+      }
+    }
+  });
 
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
